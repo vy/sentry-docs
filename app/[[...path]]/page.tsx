@@ -20,6 +20,7 @@ import {getDevDocsFrontMatter, getDocsFrontMatter, getFileBySlug} from 'sentry-d
 import {mdxComponents} from 'sentry-docs/mdxComponents';
 import {setServerContext} from 'sentry-docs/serverContext';
 import {formatGuideOrPlatformTitle} from 'sentry-docs/utils';
+import {VERSION_INDICATOR} from 'sentry-docs/versioning';
 
 export async function generateStaticParams() {
   const docs = await (isDeveloperDocs ? getDevDocsFrontMatter() : getDocsFrontMatter());
@@ -113,10 +114,13 @@ export default async function Page({params}: {params: {path?: string[]}}) {
   // collect versioned files
   const versions = (await getDocsFrontMatter())
     .filter(({slug}) => {
-      return slug.includes('__v') && slug.includes(pageNode.path.split('__v')[0]);
+      return (
+        slug.includes(VERSION_INDICATOR) &&
+        slug.includes(pageNode.path.split(VERSION_INDICATOR)[0])
+      );
     })
     .map(({slug}) => {
-      const segments = slug.split('__v');
+      const segments = slug.split(VERSION_INDICATOR);
       return segments[segments.length - 1];
     });
 
